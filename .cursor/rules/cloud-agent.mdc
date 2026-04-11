@@ -1,0 +1,28 @@
+---
+description: Cursor Cloud agent development environment instructions for Makie
+globs: 
+alwaysApply: true
+---
+
+## Environment
+
+- Julia 1.12 is installed via juliaup at `~/.juliaup/bin/julia`. The update script ensures `~/.juliaup/bin` is on `PATH`.
+- The `.scratch/` directory contains a dev environment with `ComputePipeline`, `Makie`, and `CairoMakie` already dev'd, plus a `LocalPreferences.toml` that disables precompilation workloads.
+
+## Running tests
+
+- **ComputePipeline**: `cd ComputePipeline && julia --project -e 'using Pkg; Pkg.test()'`
+- **Makie unit tests**: `cd Makie && julia --project -e 'using Pkg; Pkg.develop(PackageSpec(path="../ComputePipeline")); Pkg.test()'`
+- **CairoMakie (including reference image tests)**: `cd CairoMakie && julia --project -e 'using Pkg; Pkg.develop([PackageSpec(path="../ComputePipeline"), PackageSpec(path="../Makie")]); Pkg.test()'`. With Julia 1.12+, the `[sources]` section in `CairoMakie/test/Project.toml` resolves `ReferenceTests` automatically. On Julia 1.10, you'd need the `monorepo` env approach from CI instead.
+- Makie unit tests take ~6-10 minutes; CairoMakie reference tests take ~15-25 minutes.
+
+## Formatting / Lint
+
+Run `julia tooling/formatter/format.jl` from the repo root. This formats all source files using Runic. On first run it needs to instantiate the `tooling/formatter/` project.
+
+## Quick verification
+
+To verify the dev environment works, run from the repo root:
+```sh
+julia --project=.scratch -e 'using CairoMakie; save("/tmp/test.png", scatter(rand(10))); println("OK")'
+```
