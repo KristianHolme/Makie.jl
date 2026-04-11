@@ -102,3 +102,28 @@ julia tooling/formatter/format.jl
 ## Changelog
 
 User-facing changes (bug fixes, new features, breaking changes) must be recorded in `CHANGELOG.md` under the `## Unreleased` section at the top. Each entry is a single bullet point with a brief description and a link to the PR.
+
+## Cursor Cloud specific instructions
+
+### Environment
+
+- Julia 1.10 is installed via juliaup at `~/.juliaup/bin/julia`. The update script ensures `~/.juliaup/bin` is on `PATH`.
+- The `.scratch/` directory contains a dev environment with `ComputePipeline`, `Makie`, and `CairoMakie` already dev'd, plus a `LocalPreferences.toml` that disables precompilation workloads.
+
+### Running tests
+
+- **ComputePipeline**: `cd ComputePipeline && julia --project -e 'using Pkg; Pkg.test()'`
+- **Makie unit tests**: `cd Makie && julia --project -e 'using Pkg; Pkg.develop(PackageSpec(path="../ComputePipeline")); Pkg.test()'`
+- **CairoMakie (including reference image tests)**: Use the CI approach with a `monorepo` environment. From the repo root: `julia --project=monorepo -e 'using Pkg; Pkg.develop([PackageSpec(path="Makie"), PackageSpec(path="CairoMakie"), PackageSpec(path="ReferenceTests"), PackageSpec(path="ComputePipeline")]); Pkg.test("CairoMakie")'`. The `monorepo/` project directory is created automatically. This is necessary because `CairoMakie/test/Project.toml` uses `[sources]` for `ReferenceTests`, which requires Julia 1.11+. The monorepo env approach works on Julia 1.10.
+- Makie unit tests take ~6 minutes; CairoMakie reference tests take ~15-20 minutes.
+
+### Formatting / Lint
+
+Run `julia tooling/formatter/format.jl` from the repo root. This formats all 349 source files using Runic. On first run it needs to instantiate the `tooling/formatter/` project (downloads Runic). Subsequent runs are faster.
+
+### Quick verification
+
+To verify the dev environment works, run from the repo root:
+```sh
+julia --project=.scratch -e 'using CairoMakie; save("/tmp/test.png", scatter(rand(10))); println("OK")'
+```
