@@ -102,3 +102,13 @@ julia tooling/formatter/format.jl
 ## Changelog
 
 User-facing changes (bug fixes, new features, breaking changes) must be recorded in `CHANGELOG.md` under the `## Unreleased` section at the top. Each entry is a single bullet point with a brief description and a link to the PR.
+
+## Cursor Cloud specific instructions
+
+The environment ships with Julia (installed via `juliaup`; `julia` is on `PATH` for login shells) and a pre-built `.scratch/` dev environment that has `ComputePipeline`, `Makie`, and `CairoMakie` `dev`'d into it with `precompile_workload = false`. The startup update script keeps `.scratch/` instantiated and precompiled, so packages load without a long first-run compile.
+
+- **Default dev/render loop (no GPU needed):** `CairoMakie` renders fully headless on this VM. Use the pre-built `.scratch/` env, e.g. `julia --project=.scratch` then `using CairoMakie; save("out.png", scatter(rand(10)))`. This is the fastest way to verify rendering.
+- **Run code:** always target the scratch env with `julia --project=.scratch` (it is gitignored and already resolved). Re-run the update script only if you change a package's `Project.toml`.
+- **Lint:** `julia tooling/formatter/format.jl` reformats the whole repo in place (per the Code Formatting section). For a non-destructive check use `julia --project=tooling/formatter -e 'using Runic; exit(Runic.main(ARGS))' -- --check --diff <path>`. Note the local Runic resolves to a newer version than the CI-pinned one, so prefer the CI `runic-action` result as source of truth before finalizing.
+- **Tests:** `ComputePipeline` and `Makie` core tests need no display: `julia --project=.scratch -e 'using Pkg; Pkg.test("ComputePipeline")'` (fast). `Pkg.test("Makie")` is large/slow. `CairoMakie` tests exercise reference images and are heavier.
+- **GLMakie / WGLMakie are NOT set up here.** They need system GL/X libraries (`xorg-dev mesa-utils xvfb libgl1 freeglut3-dev libxrandr-dev libxinerama-dev libxcursor-dev libxi-dev libxext-dev`, plus `libosmesa6 libgl1-mesa-dri` and an `Electron` binary for WGLMakie) and must run under `xvfb-run`. Install those and `dev` the backend into `.scratch/` only when working on OpenGL/web rendering.
