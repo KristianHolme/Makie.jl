@@ -1,7 +1,7 @@
 name = "Makie"
 uuid = "ee78f7c6-11fb-53f2-987a-cfe4a2b5a57a"
 authors = ["Simon Danisch", "Julius Krumbiegel"]
-version = "0.25.0"
+version = "0.24.13"
 
 [deps]
 Animations = "27a7e980-b3e6-11e9-2bcd-0b925532e340"
@@ -64,6 +64,7 @@ TriplotBase = "981d1d27-644d-49a2-9326-4793e63143c3"
 UnicodeFun = "1cfade01-22cf-5700-b092-accc4b62d6e1"
 Unitful = "1986cc42-f94f-5a68-af5c-568840ba703d"
 Latexify = "23fbe1c1-3f47-55db-b15f-69d7ec21a316"
+Accessors = "7d9f7c33-5ae7-4f3b-8dc6-eff91059b697"
 
 [weakdeps]
 DynamicQuantities = "06fc5a27-2a28-4c7c-a15d-362465fb6821"
@@ -74,6 +75,7 @@ MakieDynamicQuantitiesExt = "DynamicQuantities"
 MakieFFMPEGExt = "FFMPEG_jll"
 
 [compat]
+Accessors = "0.1"
 Animations = "0.4"
 Base64 = "1.0, 1.6"
 CRC32c = "1.0, 1.6"
